@@ -2,7 +2,7 @@ const fs = require('fs');
 
 console.log("hello");
 
-let f = fs.readFileSync(process.argv[3]);
+let f = fs.readFileSync(process.argv[2]);
 let h = new Uint8Array(f);
 
 switch (process.argv[2]) {
@@ -38,6 +38,6 @@ d += "\":0";
 
 
 d += "\n}\n";
-fs.writeFileSync(process.argv[4], d, "utf8");
-fs.appendFileSync(process.argv[4], "", "utf8");
+fs.writeFileSync(process.argv[3], d, "utf8");
+fs.appendFileSync(process.argv[3], "", "utf8");
 
