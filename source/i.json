@@ -17,31 +17,7 @@
 		"gridsize" : [ 8.0, 8.0 ],
 		"boxanimatetime" : 500,
 		"title" : "Max Instrument",
-		"boxes" : [ 			{
-				"box" : 				{
-					"id" : "obj-13",
-					"maxclass" : "live.comment",
-					"numinlets" : 1,
-					"numoutlets" : 0,
-					"patching_rect" : [ 104.0, 115.0, 19.0, 18.0 ],
-					"text" : "R",
-					"textjustification" : 0
-				}
-
-			}
-, 			{
-				"box" : 				{
-					"id" : "obj-12",
-					"maxclass" : "live.comment",
-					"numinlets" : 1,
-					"numoutlets" : 0,
-					"patching_rect" : [ 31.0, 115.0, 19.0, 18.0 ],
-					"text" : "L",
-					"textjustification" : 0
-				}
-
-			}
-, 			{
+		"boxes" : [ 				{
 				"box" : 				{
 					"fontname" : "Arial Bold",
 					"fontsize" : 10.0,
