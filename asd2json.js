@@ -9,34 +9,118 @@ switch (process.argv[2]) {
 case "-h":
 	break;
 }
+
+function dbl(o)
+{
+	return int32(o);
+}
+
+function int32(o)
+{
+	return (h[o] + (h[o+1]<<8) + (h[o+2]<<16) + (h[o+3]<<24));
+}
+
+function utf16(o, l)
+{
+	let i;
+	let d = "";
+	let s = int32(o);
+	if (s > l) {
+		console.log("utf16 len " + s);
+		return [0,0];
+	}
+	o += 4;
+	for (i = 0; i < s; i += 1) {
+		d += String.fromCodePoint(h[o+i*2]);
+	}
+	return [d,s*2+4];
+}
+
+function ascii(o, l)
+{
+	let i;
+	let d = "";
+	let s = h[o];
+	if (s > l) {
+		console.log("ascii len " + s);
+		return [0,0];
+	}
+	o++;
+	for (i = 0; i < s; i += 1) {
+		d += String.fromCodePoint(h[o+i]);
+	}
+	return [d,s+1];
+}
+
+
 let o = 0;
 let d = "{";
 d += "\"I\":[" ;
-let n = (h[2] + (h[3]<<8) + (h[4]<<16) + (h[5]<<24));
+o = 2;
+let n = int32(o);
+let r;
 d += n;
 o = 6;
-d += "," + (h[o] + (h[o+1]<<8) + (h[o+2]<<16) + (h[o+3]<<24));
+d += "," + int32(o);
 o = 10;
-d += "," + (h[o] + (h[o+1]<<8) + (h[o+2]<<16) + (h[o+3]<<24));
+d += "," + int32(o);
 d += "]\n";
-o = 48 + n * 4;
-n = (h[o] + (h[o+1]<<8) + (h[o+2]<<16) + (h[o+3]<<24));
-d += ",\"SampleData\":" + n;
-o += 16;
-d += ",\"SampleData$\":" + (h[o] + (h[o+1]<<8) + (h[o+2]<<16) + (h[o+3]<<24));
-o += 4;
-n = (h[o] + (h[o+1]<<8) + (h[o+2]<<16) + (h[o+3]<<24));
-console.log("o = " + o + " " + n);
-let i;
-o += 4;
-d += ", \"";
-for (i = 0; i < n; i += 1) {
 
-	d += String.fromCodePoint(h[o+i*2]);
+o = 34 + n * 4;
+n = h.length - o;
+o += 3;
+r = ascii(o, n);
+d += ",\"" + r[0] + "\": " ;
+o += r[1];
+o += 1;
+d += int32(o) + " ";
+o += 4;
+r = ascii(o, n);
+d += ",\"" + r[0] + "\": " ;
+o += r[1];
+let nb_field = int32(o);
+d += nb_field + " ";
+o += 4;
+
+let i = 0;
+n = h.length - o;
+while (i < n) {
+	if (nb_field < 1) {
+		break;
+	}
+	nb_field--;
+	r = utf16(o + i, n - i);
+	if (r[1] < 1) {
+		break;
+	}
+	d += ",\n \"" + r[0] +"\":";
+	i += r[1];
+	i++;
+	r = ascii(o + i, n - i);
+	if (r[1] < 1) {
+		break;
+	}
+	i += r[1];
+	switch (r[0]) {
+	case "RemoteableDouble":
+	case "RemoteableBool":
+	case "UserFloat":
+	case "RemoteableEnum":
+	case "RemoteableTimeSignature":
+	case "RemoteableInt":
+	case "RemoteableList":
+	case "OnSets":
+	case "OnsetArray":
+	case "AufTaktData":
+	case "SampleOverView":
+		break;
+	default:
+		console.log("case \"" + r[0] + "\":");
+	}
+	d += " \"" + r[0] +"\" ";
 }
-d += "\":0";
-
-
+o += i;
+console.log("end : " + o + " = " + h.length);
 d += "\n}\n";
 fs.writeFileSync(process.argv[3], d, "utf8");
 fs.appendFileSync(process.argv[3], "", "utf8");
